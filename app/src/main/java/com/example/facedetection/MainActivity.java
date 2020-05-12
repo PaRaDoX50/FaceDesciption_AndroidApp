@@ -217,18 +217,32 @@ public class MainActivity extends AppCompatActivity {
                                         public void onSuccess(List<FirebaseVisionFace> faces) {
                                             // Task completed successfully
                                             // ...
-                                            for (FirebaseVisionFace face : faces) {
-                                                FirebaseVisionFaceLandmark leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
-                                                FirebaseVisionFaceLandmark rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
-                                                if (leftEye != null && rightEye != null) {
-                                                    FirebaseVisionPoint leftEyePos = leftEye.getPosition();
-                                                    FirebaseVisionPoint rightEyePos = rightEye.getPosition();
-                                                    Toast.makeText(MainActivity.this, "Left:" + leftEyePos.toString() + "Right:" + rightEyePos.toString(), Toast.LENGTH_LONG).show();
-                                                }
+                                            if (!faces.isEmpty()) {
+                                                for (FirebaseVisionFace face : faces) {
+                                                    FirebaseVisionFaceLandmark leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
+                                                    FirebaseVisionFaceLandmark rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
+                                                    FirebaseVisionFaceLandmark rightEar = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR);
+                                                    FirebaseVisionFaceLandmark leftEar = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR);
+                                                    float smile = face.getSmilingProbability();
+                                                    if (smile != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
+                                                        Intent intent = new Intent(MainActivity.this, DescriptionActivity.class);
+                                                        intent.putExtra("smile", smile);
+//                                                intent.putExtra("lEar", leftEar.getPosition().toString());
+//                                                intent.putExtra("rEar",rightEar.getPosition().toString());
+//                                                intent.putExtra("lEye",leftEye.getPosition().toString());
+//                                                intent.putExtra("rEye",rightEye.getPosition().toString());
+                                                        startActivity(intent);
 
+
+                                                    }
+                                                }
+                                                Log.d("LISTISHERE", "onSuccess: " + faces);
                                             }
-                                            Log.d("LISTISHERE", "onSuccess: " + faces);
+                                            else{
+                                                Toast.makeText(MainActivity.this, "Face cannot be detected",Toast.LENGTH_LONG).show();
+                                            }
                                         }
+
                                     })
                             .addOnFailureListener(
                                     new OnFailureListener() {
@@ -236,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
                                         public void onFailure(@NonNull Exception e) {
                                             // Task failed with an exception
                                             // ...
-                                            Log.d("LISTISHERE", "onFailure: " + e.toString());
+                                            Toast.makeText(MainActivity.this, "Something went wrong",Toast.LENGTH_LONG).show();
                                         }
                                     });
 
